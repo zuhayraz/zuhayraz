@@ -1,5 +1,3 @@
-### Hi there 👋
-
 <h1 align="center">Hi 👋, I'm Zuhayr Arif</h1>
 <h3 align="center">A Data Science Student at Universiti Teknologi Malaysia</h3>
 
