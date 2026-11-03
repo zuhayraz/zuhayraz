@@ -39,5 +39,21 @@ const out = args.find(a => a.endsWith('.mp4')) || path.join(__dirname, 'UTM-Rank
   ff.stdin.end();
   await new Promise(r => ff.on('close', r));
   await browser.close();
+
+  // Optional soundtrack: drop the instrumental into assets/ as music.mp3 / .m4a / .wav.
+  // It is trimmed (or looped) to the video length, with a 1s fade-in and 2.5s fade-out.
+  const music = ['mp3', 'm4a', 'wav', 'aac'].map(e => path.join(__dirname, 'assets', 'music.' + e)).find(f => fs.existsSync(f));
+  if (music) {
+    const tmp = out.replace(/\.mp4$/, '.silent.mp4');
+    fs.renameSync(out, tmp);
+    const fadeOut = Math.max(0, duration - 2.5).toFixed(2);
+    const mux = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-i', tmp, '-stream_loop', '-1', '-i', music,
+      '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k',
+      '-af', `afade=t=in:d=1,afade=t=out:st=${fadeOut}:d=2.5`, '-t', duration.toFixed(2), '-movflags', '+faststart', out],
+      { stdio: 'inherit' });
+    await new Promise(r => mux.on('close', r));
+    fs.unlinkSync(tmp);
+    console.log('added soundtrack', path.basename(music));
+  }
   console.log('done', out, `${duration.toFixed(1)}s`);
 })();
