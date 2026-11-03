@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>UTM Rankings Reel</title>
+<style>
+  :root{
+    --maroon-900:#2E0614; --maroon-800:#45091E; --maroon-700:#5E0D29; --maroon-600:#7A1436;
+    --gold-300:#F3DFA6; --gold-400:#E6C677; --gold-500:#D2A84E; --gold-600:#A9822F;
+    --ivory:#FBF6EC; --ivory-dim:rgba(251,246,236,.72); --ivory-faint:rgba(251,246,236,.45);
+    --sdg7:#FCC30B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--maroon-900)}
+  body{font-family:"Inter","Inter Display",sans-serif;color:var(--ivory);-webkit-font-smoothing:antialiased}
+  #stage{position:relative;width:1920px;height:1080px;overflow:hidden;
+    background:radial-gradient(1200px 900px at 30% 35%, var(--maroon-600) 0%, var(--maroon-700) 35%, var(--maroon-800) 70%, var(--maroon-900) 100%);}
+  canvas#fx{position:absolute;inset:0}
+  .scene{position:absolute;inset:0;opacity:0}
+  .a{will-change:transform,opacity}
+  .display{font-family:"Inter Display","Inter",sans-serif}
+  .eyebrow{font-size:30px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold-400);font-weight:600}
+  .gold-text{background:linear-gradient(180deg,var(--gold-300) 0%,var(--gold-400) 45%,var(--gold-600) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .rule{height:3px;background:linear-gradient(90deg,transparent,var(--gold-500),transparent);transform-origin:center}
+  .center{position:absolute;left:0;right:0;text-align:center}
+  .pill{display:inline-block;padding:12px 30px;border:2px solid var(--gold-500);border-radius:999px;
+    font-size:30px;font-weight:600;color:var(--gold-300);letter-spacing:.06em}
+
+  /* Chrome */
+  #brand{position:absolute;left:80px;bottom:56px;display:flex;align-items:center;gap:20px;opacity:0}
+  #brand .mark{font-family:"Inter Display";font-weight:900;font-size:40px;letter-spacing:.04em;color:var(--gold-400)}
+  #brand .sep{width:2px;height:34px;background:var(--gold-600)}
+  #brand .name{font-size:22px;letter-spacing:.18em;text-transform:uppercase;color:var(--ivory-dim);font-weight:500}
+  #source{position:absolute;right:80px;bottom:62px;font-size:20px;color:var(--ivory-faint);letter-spacing:.04em;text-align:right}
+
+  /* Intro */
+  #s-intro .uni{top:360px;font-size:44px;letter-spacing:.34em;text-transform:uppercase;font-weight:500;color:var(--ivory)}
+  #s-intro .big{top:430px;font-size:150px;font-weight:800;line-height:1;letter-spacing:-.01em}
+  #s-intro .rule{position:absolute;left:560px;width:800px;top:620px}
+  #s-intro .sub{top:660px;font-size:34px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-400);font-weight:500}
+
+  /* Rank hero scenes */
+  .hero .eyebrow{position:absolute;left:0;right:0;text-align:center;top:190px}
+  .hero .num{position:absolute;left:0;right:0;text-align:center;top:250px;font-size:420px;font-weight:900;line-height:1;letter-spacing:-.04em}
+  .hero .num .hash{font-size:.5em;vertical-align:.62em;margin-right:.04em;font-weight:800}
+  .hero .label{top:700px;font-size:64px;font-weight:700;letter-spacing:.01em}
+  .hero .meta{top:800px;font-size:32px;color:var(--ivory-dim);font-weight:400;letter-spacing:.02em}
+
+  /* Subjects */
+  #s-subj .eyebrow{position:absolute;left:0;right:0;text-align:center;top:120px}
+  #s-subj .title{top:170px;font-size:64px;font-weight:800}
+  #s-subj .rule{position:absolute;left:660px;width:600px;top:268px}
+  .card{position:absolute;left:260px;top:330px;width:1400px;height:470px;opacity:0;
+    border:2px solid rgba(210,168,78,.55);border-radius:28px;
+    background:linear-gradient(135deg,rgba(255,255,255,.07),rgba(255,255,255,.02));
+    display:flex;align-items:center;padding:0 80px;gap:70px;overflow:hidden}
+  .card .rank{width:560px;flex:none;text-align:center;font-weight:900;line-height:1;letter-spacing:-.03em}
+  .card .rank .hash{font-size:.5em;vertical-align:.6em;font-weight:800}
+  .card .rank .small{display:block;font-size:44px;letter-spacing:.2em;font-weight:700;margin-bottom:6px}
+  .card .divider{width:3px;height:300px;background:linear-gradient(180deg,transparent,var(--gold-500),transparent);flex:none}
+  .card .info{flex:1}
+  .card .kind{font-size:24px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-400);font-weight:600;margin-bottom:18px}
+  .card .subject{font-size:66px;font-weight:800;line-height:1.08;margin-bottom:30px}
+  .card .prev{font-size:28px;color:var(--ivory-dim);margin-top:22px}
+  #dots{position:absolute;left:0;right:0;top:850px;display:flex;justify-content:center;gap:18px}
+  #dots i{display:block;width:16px;height:16px;border-radius:50%;border:2px solid var(--gold-500);background:transparent}
+  #dots i.on{background:var(--gold-400)}
+
+  /* SDG */
+  #s-sdg .eyebrow{position:absolute;left:0;right:0;text-align:center;top:150px}
+  #s-sdg .wrap{position:absolute;left:0;right:0;top:290px;display:flex;justify-content:center;align-items:center;gap:90px}
+  #s-sdg .tile{width:400px;height:400px;background:var(--sdg7);border-radius:24px;color:#fff;position:relative;
+    padding:30px;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+  #s-sdg .tile .n{font-size:150px;font-weight:900;line-height:.9;font-family:"Inter Display"}
+  #s-sdg .tile .t{font-size:36px;font-weight:800;line-height:1.05;text-transform:uppercase;margin-top:12px;letter-spacing:.01em}
+  #s-sdg .tile svg{position:absolute;right:28px;bottom:24px}
+  #s-sdg .right{width:760px}
+  #s-sdg .num{font-size:340px;font-weight:900;line-height:.9;letter-spacing:-.04em}
+  #s-sdg .num .hash{font-size:.5em;vertical-align:.6em;font-weight:800}
+  #s-sdg .what{font-size:54px;font-weight:800;margin-top:16px}
+  #s-sdg .ring{position:absolute;border:3px solid var(--gold-400);border-radius:50%}
+  #s-sdg .bottom{top:770px;font-size:34px;color:var(--ivory-dim)}
+
+  /* Outro */
+  #s-outro .eyebrow{position:absolute;left:0;right:0;text-align:center;top:250px}
+  #s-outro .uni{top:300px;font-size:72px;font-weight:800}
+  #s-outro .rule{position:absolute;left:560px;width:800px;top:410px}
+  #s-outro .grid{position:absolute;left:150px;right:150px;top:480px;display:grid;grid-template-columns:repeat(4,1fr);gap:36px}
+  #s-outro .stat{border:2px solid rgba(210,168,78,.55);border-radius:24px;padding:40px 20px;text-align:center;
+    background:linear-gradient(135deg,rgba(255,255,255,.07),rgba(255,255,255,.02))}
+  #s-outro .stat .v{font-size:120px;font-weight:900;line-height:1;letter-spacing:-.03em}
+  #s-outro .stat .v .hash{font-size:.5em;vertical-align:.6em}
+  #s-outro .stat .k{font-size:28px;font-weight:700;margin-top:16px;letter-spacing:.06em;text-transform:uppercase}
+  #s-outro .stat .s{font-size:22px;color:var(--ivory-dim);margin-top:8px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="fx" width="1920" height="1080"></canvas>
+
+  <!-- Intro -->
+  <section class="scene" id="s-intro">
+    <div class="center uni a">Universiti Teknologi Malaysia</div>
+    <div class="center big display gold-text a">Global Rankings</div>
+    <div class="rule a"></div>
+    <div class="center sub a">Highlights 2026 · 2027</div>
+  </section>
+
+  <!-- QS WUR -->
+  <section class="scene hero" id="s-wur">
+    <div class="eyebrow a">QS World University Rankings 2027</div>
+    <div class="num display gold-text a"><span class="hash">#</span><span class="cnt">158</span></div>
+    <div class="center label a">in the World</div>
+    <div class="center meta a">Among the top 200 universities worldwide</div>
+  </section>
+
+  <!-- Malaysia -->
+  <section class="scene hero" id="s-my">
+    <div class="eyebrow a">QS World University Rankings 2027</div>
+    <div class="num display gold-text a"><span class="hash">#</span><span class="cnt">5</span></div>
+    <div class="center label a">in Malaysia</div>
+    <div class="center meta a">One of five Malaysian universities in the global top 200</div>
+  </section>
+
+  <!-- QS Asia -->
+  <section class="scene hero" id="s-asia">
+    <div class="eyebrow a">QS World University Rankings: Asia 2026</div>
+    <div class="num display gold-text a"><span class="hash">#</span><span class="cnt">25</span></div>
+    <div class="center label a">in Asia</div>
+    <div class="center meta a">Up from #28 in 2025</div>
+  </section>
+
+  <!-- Subjects -->
+  <section class="scene" id="s-subj">
+    <div class="eyebrow a">QS World University Rankings by Subject 2026</div>
+    <div class="center title a">Global Top 100</div>
+    <div class="rule a"></div>
+    <div id="cards"></div>
+    <div id="dots" class="a"></div>
+  </section>
+
+  <!-- SDG -->
+  <section class="scene" id="s-sdg">
+    <div class="eyebrow a">THE Impact Rankings 2026</div>
+    <div class="wrap">
+      <div class="tile a">
+        <div class="n">7</div>
+        <div class="t">Affordable and<br>clean energy</div>
+        <svg width="110" height="110" viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round">
+          <circle cx="50" cy="50" r="17"/>
+          <g id="rays"><line x1="50" y1="8" x2="50" y2="22"/><line x1="50" y1="78" x2="50" y2="92"/>
+          <line x1="8" y1="50" x2="22" y2="50"/><line x1="78" y1="50" x2="92" y2="50"/>
+          <line x1="20" y1="20" x2="30" y2="30"/><line x1="70" y1="70" x2="80" y2="80"/>
+          <line x1="80" y1="20" x2="70" y2="30"/><line x1="30" y1="70" x2="20" y2="80"/></g>
+          <path d="M53 38 L44 52 H56 L47 64" stroke-width="5"/>
+        </svg>
+      </div>
+      <div class="right">
+        <div class="num display gold-text a"><span class="hash">#</span><span class="cnt">9</span></div>
+        <div class="what a">in the World</div>
+        <div class="pill a" style="margin-top:28px">Global Top 10 · SDG 7</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Outro -->
+  <section class="scene" id="s-outro">
+    <div class="eyebrow a">Rankings at a glance</div>
+    <div class="center uni a">Universiti Teknologi Malaysia</div>
+    <div class="rule a"></div>
+    <div class="grid">
+      <div class="stat a"><div class="v display gold-text"><span class="hash">#</span>158</div><div class="k">World</div><div class="s">QS WUR 2027</div></div>
+      <div class="stat a"><div class="v display gold-text"><span class="hash">#</span>25</div><div class="k">Asia</div><div class="s">QS Asia 2026</div></div>
+      <div class="stat a"><div class="v display gold-text"><span class="hash">#</span>5</div><div class="k">Malaysia</div><div class="s">QS WUR 2027</div></div>
+      <div class="stat a"><div class="v display gold-text"><span class="hash">#</span>9</div><div class="k">SDG 7 World</div><div class="s">THE Impact 2026</div></div>
+    </div>
+  </section>
+
+  <div id="brand"><span class="mark">UTM</span><span class="sep"></span><span class="name">Universiti Teknologi Malaysia</span></div>
+  <div id="source"></div>
+</div>
+
+<script>
+// ---------- Data ----------
+const SUBJECTS = [
+  {rank:"36",  hash:true,  kind:"Subject", name:"Petroleum Engineering",                 my:"#3 in Malaysia", prev:"Up from #46"},
+  {rank:"50",  hash:false, top:true, kind:"Subject", name:"Architecture & Built Environment", my:"#1 in Malaysia", prev:"Up from 51–100"},
+  {rank:"77",  hash:true,  kind:"Subject", name:"Electrical & Electronic Engineering",   my:"#2 in Malaysia", prev:""},
+  {rank:"83",  hash:true,  kind:"Subject", name:"Chemical Engineering",                  my:"#1 in Malaysia", prev:""},
+  {rank:"51–100", hash:false, band:true, kind:"Subject", name:"Civil & Structural Engineering", my:"#1 in Malaysia", prev:""},
+  {rank:"51–100", hash:false, band:true, kind:"Subject", name:"Mineral & Mining Engineering",   my:"#1 in Malaysia", prev:""},
+  {rank:"86",  hash:true,  kind:"Broad subject area", name:"Engineering & Technology",   my:"#2 in Malaysia", prev:"Up from #102"},
+];
+
+// ---------- Timeline (seconds) ----------
+const SUBJ_EACH = 2.3;
+const T = {
+  intro:[0,4.2], wur:[4.2,10.2], my:[10.2,15.2], asia:[15.2,20.4],
+  subj:[20.4, 20.4 + 1.2 + SUBJECTS.length*SUBJ_EACH + 0.4],
+};
+T.sdg   = [T.subj[1], T.subj[1] + 5.6];
+T.outro = [T.sdg[1],  T.sdg[1] + 4.4];
+const DURATION = T.outro[1];
+window.DURATION = DURATION;
+
+const SOURCES = {
+  wur:"Source: QS World University Rankings 2027",
+  my:"Source: QS World University Rankings 2027",
+  asia:"Source: QS World University Rankings: Asia 2026",
+  subj:"Source: QS World University Rankings by Subject 2026",
+  sdg:"Source: THE Impact Rankings (Sustainability Impact Ratings) 2026",
+  outro:"Sources: QS 2026–2027 · THE Impact 2026",
+};
+
+// ---------- Helpers ----------
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const easeOut=x=>1-Math.pow(1-x,3);
+const easeInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const easeBack=x=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+const prog=(t,start,dur)=>clamp((t-start)/dur);
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+
+function sceneAlpha(t,[s,e],fin=.5,fout=.5){
+  if(t<s||t>e) return 0;
+  return Math.min(easeOut(prog(t,s,fin)), easeOut(clamp((e-t)/fout)));
+}
+// Rise-in for an element: delay relative to scene start
+function rise(el,t,start,{dy=50,dur=.7,scale=null,dx=0}={}){
+  const p=easeOut(prog(t,start,dur));
+  let tf=`translate(${(1-p)*dx}px,${(1-p)*dy}px)`;
+  if(scale!==null) tf+=` scale(${scale+(1-scale)*p})`;
+  el.style.opacity=p; el.style.transform=tf;
+}
+
+// ---------- Build subject cards ----------
+const cardsEl=$("#cards"), dotsEl=$("#dots");
+SUBJECTS.forEach((s,i)=>{
+  const c=document.createElement("div"); c.className="card";
+  const sz = s.band ? 150 : 250;
+  let rankHtml;
+  if(s.top) rankHtml=`<span class="small gold-text">TOP</span><span class="display gold-text" style="font-size:250px">50</span>`;
+  else if(s.band) rankHtml=`<span class="small gold-text">TOP 100</span><span class="display gold-text" style="font-size:${sz}px">${s.rank}</span>`;
+  else rankHtml=`<span class="display gold-text" style="font-size:${sz}px"><span class="hash">#</span>${s.rank}</span>`;
+  c.innerHTML=`<div class="rank">${rankHtml}</div><div class="divider"></div>
+    <div class="info"><div class="kind">${s.kind}</div><div class="subject">${s.name}</div>
+    <span class="pill">${s.my}</span>${s.prev?`<div class="prev">${s.prev}</div>`:""}</div>`;
+  cardsEl.appendChild(c);
+  dotsEl.appendChild(document.createElement("i"));
+});
+
+// ---------- Background FX (periodic over DURATION so the loop is seamless) ----------
+const fx=$("#fx"), g=fx.getContext("2d");
+let seed=7; const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646};
+const P=Array.from({length:70},()=>({x:rnd(),y:rnd(),r:1+rnd()*2.6,k:1+Math.floor(rnd()*3),a:.15+rnd()*.45,ph:rnd()*Math.PI*2,w:20+rnd()*60}));
+function drawFX(t){
+  g.clearRect(0,0,1920,1080);
+  const u=t/DURATION;
+  // slow rotating gold arcs
+  g.save(); g.translate(1520,300); g.rotate(u*Math.PI*2);
+  g.strokeStyle="rgba(210,168,78,.10)"; g.lineWidth=2;
+  for(let i=0;i<4;i++){g.beginPath();g.arc(0,0,260+i*90,i*.9,i*.9+Math.PI*1.2);g.stroke();}
+  g.restore();
+  g.save(); g.translate(360,860); g.rotate(-u*Math.PI*2);
+  g.strokeStyle="rgba(210,168,78,.08)"; g.lineWidth=2;
+  for(let i=0;i<3;i++){g.beginPath();g.arc(0,0,200+i*80,i*1.3,i*1.3+Math.PI);g.stroke();}
+  g.restore();
+  // drifting particles (integer wraps per loop -> periodic)
+  for(const p of P){
+    const y=((p.y - u*p.k)%1+1)%1;
+    const x=p.x + Math.sin(u*Math.PI*2*p.k+p.ph)*p.w/1920;
+    const tw=.6+.4*Math.sin(u*Math.PI*2*6+p.ph);
+    g.beginPath(); g.fillStyle=`rgba(230,198,119,${p.a*tw})`;
+    g.arc(x*1920,y*1080,p.r,0,Math.PI*2); g.fill();
+  }
+  // diagonal light sweep, twice per loop
+  const sw=((u*2)%1);
+  const sx=-600+sw*3200;
+  const grd=g.createLinearGradient(sx-300,0,sx+300,0);
+  grd.addColorStop(0,"rgba(255,230,170,0)");grd.addColorStop(.5,"rgba(255,230,170,.05)");grd.addColorStop(1,"rgba(255,230,170,0)");
+  g.save(); g.transform(1,0,-.35,1,0,0); g.fillStyle=grd; g.fillRect(sx-300+200,0,600,1080); g.restore();
+}
+
+// ---------- Count helper ----------
+function count(el,t,start,dur,from,to){
+  const p=easeOut(prog(t,start,dur));
+  el.textContent=Math.round(from+(to-from)*p);
+}
+
+// ---------- Render one frame at time t ----------
+function renderAt(t){
+  t=((t%DURATION)+DURATION)%DURATION;
+  drawFX(t);
+
+  // brand + source chrome
+  const brandA = t<T.intro[0]+1.2 ? 0 : (t>T.outro[1]-0.6 ? clamp((T.outro[1]-t)/.6) : easeOut(prog(t,T.intro[0]+1.2,.6)));
+  $("#brand").style.opacity = brandA;
+  let key=null; for(const k of ["wur","my","asia","subj","sdg","outro"]) if(t>=T[k][0]&&t<T[k][1]) key=k;
+  const src=$("#source"); src.textContent = key?SOURCES[key]:"";
+  src.style.opacity = key? sceneAlpha(t,T[key],.6,.4)*1 : 0;
+
+  // Intro
+  { const sc=$("#s-intro"), [s]=T.intro; sc.style.opacity=sceneAlpha(t,T.intro,.6,.5);
+    const [uni,big,rule,sub]=$$(".a",sc);
+    rise(uni,t,s+.2,{dy:30}); rise(big,t,s+.5,{dy:60,dur:.9,scale:.92});
+    const rp=easeInOut(prog(t,s+1.1,.8)); rule.style.opacity=rp; rule.style.transform=`scaleX(${rp})`;
+    rise(sub,t,s+1.5,{dy:30}); }
+
+  // Hero scenes
+  const heroes=[["#s-wur",T.wur,500,158],["#s-my",T.my,null,5],["#s-asia",T.asia,100,25]];
+  for(const [id,range,from,to] of heroes){
+    const sc=$(id), s=range[0]; sc.style.opacity=sceneAlpha(t,range,.5,.5);
+    if(sc.style.opacity==0) continue;
+    const [eb,num,label,meta]=$$(".a",sc);
+    rise(eb,t,s+.15,{dy:30});
+    const p=prog(t,s+.35,.9); const sp=easeBack(p);
+    num.style.opacity=clamp(p*2.5); num.style.transform=`scale(${.7+.3*sp})`;
+    const cnt=num.querySelector(".cnt");
+    if(from!==null) count(cnt,t,s+.35,1.6,from,to); else cnt.textContent=to;
+    // subtle glow pulse once landed
+    const land=prog(t,s+2.0,1.2);
+    num.style.filter=`drop-shadow(0 0 ${Math.sin(land*Math.PI)*40}px rgba(230,198,119,.55))`;
+    rise(label,t,s+1.0,{dy:40}); rise(meta,t,s+1.4,{dy:30});
+  }
+
+  // Subjects
+  { const sc=$("#s-subj"), [s]=T.subj; sc.style.opacity=sceneAlpha(t,T.subj,.5,.4);
+    const [eb,title,rule,dots]=[$(".eyebrow",sc),$(".title",sc),$(".rule",sc),$("#dots")];
+    rise(eb,t,s+.1,{dy:30}); rise(title,t,s+.3,{dy:40});
+    const rp=easeInOut(prog(t,s+.6,.6)); rule.style.opacity=rp; rule.style.transform=`scaleX(${rp})`;
+    rise(dots,t,s+.8,{dy:20});
+    const base=s+1.2; const cards=$$(".card",sc); const dd=$$("#dots i");
+    cards.forEach((c,i)=>{
+      const cs=base+i*SUBJ_EACH, ce=cs+SUBJ_EACH;
+      const pin=easeOut(prog(t,cs,.5)), pout=easeInOut(prog(t,ce-.4,.4));
+      const last = i===cards.length-1;
+      if(t<cs||t>ce+(last?1:0)){c.style.opacity=0;return;}
+      const out = last?0:pout;
+      c.style.opacity=pin*(1-out);
+      c.style.transform=`translateX(${(1-pin)*160 - out*160}px)`;
+      const r=c.querySelector(".rank"); const rp2=easeBack(prog(t,cs+.15,.6));
+      r.style.transform=`scale(${.75+.25*rp2})`;
+      dd[i].classList.toggle("on", t>=cs);
+    });
+  }
+
+  // SDG
+  { const sc=$("#s-sdg"), [s]=T.sdg; sc.style.opacity=sceneAlpha(t,T.sdg,.5,.5);
+    const [eb,tile,num,what,pill]=$$(".a",sc);
+    rise(eb,t,s+.1,{dy:30});
+    const tp=prog(t,s+.3,.8); tile.style.opacity=clamp(tp*2);
+    tile.style.transform=`rotate(${(1-easeBack(tp))*-10}deg) scale(${.6+.4*easeBack(tp)})`;
+    $("#rays").style.transformOrigin="50px 50px"; $("#rays").style.transform=`rotate(${(t-s)*30}deg)`;
+    const np=prog(t,s+.9,.8); num.style.opacity=clamp(np*2.5); num.style.transform=`scale(${.7+.3*easeBack(np)})`;
+    count(num.querySelector(".cnt"),t,s+.9,1.2,60,9);
+    rise(what,t,s+1.5,{dy:30}); rise(pill,t,s+1.9,{dy:30});  }
+
+  // Outro
+  { const sc=$("#s-outro"), [s]=T.outro; sc.style.opacity=sceneAlpha(t,T.outro,.5,.7);
+    const els=$$(".a",sc); const [eb,uni,rule,...stats]=els;
+    rise(eb,t,s+.1,{dy:30}); rise(uni,t,s+.3,{dy:40});
+    const rp=easeInOut(prog(t,s+.6,.6)); rule.style.opacity=rp; rule.style.transform=`scaleX(${rp})`;
+    stats.forEach((st,i)=>rise(st,t,s+.8+i*.18,{dy:60,scale:.9}));
+  }
+}
+window.renderAt=renderAt;
+
+// Live preview mode (open the file in a browser): plays in real time, loops.
+if(!location.search.includes("capture")){
+  const t0=performance.now();
+  const loop=()=>{renderAt((performance.now()-t0)/1000);requestAnimationFrame(loop)};
+  requestAnimationFrame(loop);
+} else { renderAt(0); }
+</script>
+</body>
+</html>
