@@ -114,7 +114,7 @@
   #s-outro .eyebrow{position:absolute;left:0;right:0;text-align:center;top:190px}
   #s-outro .uni{top:232px;font-size:64px;font-weight:700}
   #s-outro .rule{left:610px;width:700px;top:336px}
-  #s-outro .grid{position:absolute;left:120px;right:120px;top:390px;display:grid;grid-template-columns:repeat(5,1fr);gap:28px}
+  #s-outro .grid{position:absolute;left:180px;right:180px;top:390px;display:grid;grid-template-columns:repeat(4,1fr);gap:36px}
   #s-outro .stat{border:2px solid var(--gold);border-radius:var(--radius-md);padding:34px 12px;text-align:center;
     background:linear-gradient(135deg,#ffffff 0%,#fff8ec 100%);box-shadow:0 20px 50px rgba(92,0,30,.08)}
   #s-outro .stat .v{font-size:104px;font-weight:800;line-height:1;letter-spacing:-.03em}
@@ -156,19 +156,10 @@
 
   <!-- QS Asia -->
   <section class="scene hero" id="s-asia">
-    <div class="eyebrow a">QS World University Rankings: Asia 2027</div>
+    <div class="eyebrow a">QS World University Rankings: Asia 2026</div>
     <div class="num num-text a"><span class="hash">#</span><span class="cnt">25</span></div>
     <div class="center label a">in Asia</div>
-    <div class="center meta a">Top 25 in Asia for the second consecutive year</div>
-  </section>
-
-  <!-- QS Sustainability -->
-  <section class="scene hero" id="s-sus">
-    <div class="eyebrow a">QS World University Rankings: Sustainability 2027</div>
-    <div class="num num-text a"><span class="hash">#</span><span class="cnt">306</span></div>
-    <div class="center label a">in the World</div>
-    <div class="center meta a">Up 92 places from #398</div>
-    <div class="center pillrow a"><span class="pill">#4 in Malaysia</span></div>
+    <div class="center meta a">Up from #28 in 2025</div>
   </section>
 
   <!-- Subjects -->
@@ -212,8 +203,7 @@
     <div class="grid">
       <div class="stat a"><div class="v num-text"><span class="hash">#</span>158</div><div class="k">World</div><div class="s">QS WUR 2027</div></div>
       <div class="stat a"><div class="v num-text"><span class="hash">#</span>5</div><div class="k">Malaysia</div><div class="s">QS WUR 2027</div></div>
-      <div class="stat a"><div class="v num-text"><span class="hash">#</span>25</div><div class="k">Asia</div><div class="s">QS Asia 2027</div></div>
-      <div class="stat a"><div class="v num-text"><span class="hash">#</span>306</div><div class="k">Sustainability</div><div class="s">QS Sustainability 2027</div></div>
+      <div class="stat a"><div class="v num-text"><span class="hash">#</span>25</div><div class="k">Asia</div><div class="s">QS Asia 2026</div></div>
       <div class="stat a"><div class="v num-text"><span class="hash">#</span>9</div><div class="k">SDG 7 World</div><div class="s">THE Impact 2026</div></div>
     </div>
     <div class="center tagline a">Kerana Tuhan Untuk Manusia<small>In the name of God for Mankind</small></div>
@@ -252,13 +242,13 @@ const SUBJECTS = [
 const SUBJ_EACH = 2.3;
 const T = {};
 let cur = 0; const seg=(k,d)=>{T[k]=[cur,cur+d];cur+=d;};
-seg("intro",4.4); seg("wur",5.6); seg("my",5.0); seg("asia",5.2); seg("sus",6.0);
+seg("intro",4.4); seg("wur",5.6); seg("my",5.0); seg("asia",5.2);
 seg("subj",1.2 + SUBJECTS.length*SUBJ_EACH + 0.4); seg("sdg",5.6); seg("outro",6.0);
 const DURATION = cur; window.DURATION = DURATION;
 
 const SOURCES = {
   intro:"", wur:"Source: QS World University Rankings 2027", my:"Source: QS World University Rankings 2027",
-  asia:"Source: QS World University Rankings: Asia 2027", sus:"Source: QS World University Rankings: Sustainability 2027",
+  asia:"Source: QS World University Rankings: Asia 2026",
   subj:"Source: QS World University Rankings by Subject 2026", sdg:"Source: THE Impact Rankings 2026",
   outro:"Sources: QS 2026–2027 · THE Impact Rankings 2026",
 };
@@ -351,7 +341,6 @@ function renderAt(t){
   hero("#s-wur",T.wur,500,158);
   hero("#s-my",T.my,null,5);
   hero("#s-asia",T.asia,100,25);
-  hero("#s-sus",T.sus,398,306);
 
   // Subjects
   { const sc=$("#s-subj"), s=T.subj[0]; sc.style.opacity=sceneAlpha(t,T.subj,.5,.4);
