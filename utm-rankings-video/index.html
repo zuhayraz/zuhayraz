@@ -52,14 +52,17 @@
 
   /* Persistent chrome: colour logo top-right with space-4 clear space; FooterBand (white-ground variant) */
   #logo{position:absolute;top:var(--space-4);right:var(--space-4);height:96px;opacity:0}
-  #band{position:absolute;left:0;right:0;bottom:0;height:96px;background:var(--maroon-logo);
-    border-radius:var(--radius-band) var(--radius-band) 0 0;padding:0 var(--space-4);
-    display:flex;align-items:center;gap:var(--space-3);color:var(--on-maroon)}
-  #band .tag{font-weight:700;font-style:italic;font-size:30px;letter-spacing:-.01em;margin-right:var(--space-2)}
-  #band .div{width:2px;align-self:stretch;margin:24px 0;background:currentColor}
-  #band .h{font-size:24px;font-weight:400}
-  #band .h + .h::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);
-    vertical-align:middle;margin:0 var(--space-3) 0 0;position:relative;top:-2px}
+  /* Footer band, matched to the supplied UTM footer artwork */
+  #band{position:absolute;left:0;right:0;bottom:0;height:100px;background:#901041;
+    border-radius:76px 76px 0 0;padding:0 96px;
+    display:flex;align-items:center;color:var(--on-maroon)}
+  #band .tag{font-weight:700;font-style:italic;font-size:34px;letter-spacing:-.005em;white-space:nowrap}
+  #band .div{width:5px;height:48px;background:currentColor;margin:0 92px}
+  #band .grp{display:flex;align-items:center;gap:4px;margin-right:26px;white-space:nowrap}
+  #band .ico{font-style:normal;width:44px;height:44px;border:2.5px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+  #band .ico svg{width:24px;height:24px;fill:#fff}
+  #band .ico .txt{font-family:Arial,"Liberation Sans",sans-serif;font-weight:700;color:#fff;line-height:1}
+  #band .h{font-family:Arial,"Liberation Sans",sans-serif;font-size:23px;font-weight:400;margin-left:4px}
   #source{position:absolute;right:var(--space-4);bottom:116px;font-size:20px;color:var(--ink-soft);text-align:right}
 
   /* Intro */
@@ -103,7 +106,7 @@
   #s-sdg .tile .n{font-size:150px;font-weight:800;line-height:.95}
   #s-sdg .tile .t{font-size:36px;font-weight:700;line-height:1.1;text-transform:uppercase;margin-top:10px}
   #s-sdg .tile svg{position:absolute;right:28px;bottom:24px}
-  #s-sdg .right{width:760px}
+  #s-sdg .right{width:auto;min-width:520px;text-align:center}
   #s-sdg .num{font-size:330px;font-weight:800;line-height:.95;letter-spacing:-.03em}
   #s-sdg .what{font-size:58px;font-weight:700;margin-top:10px}
 
@@ -221,10 +224,16 @@
   <div id="band">
     <span class="tag">Innovating Sustainable Solutions</span>
     <span class="div"></span>
-    <span class="h">Universiti Teknologi Malaysia</span>
-    <span class="h">utm_my</span>
-    <span class="h">utmofficial</span>
+    <span class="grp"><i class="ico" data-i="youtube"></i><i class="ico"><span class="txt" style="font-size:25px">in</span></i><i class="ico"><span class="txt" style="font-size:28px;font-family:'Liberation Sans',Arial,sans-serif">f</span></i><span class="h">Universiti Teknologi Malaysia</span></span>
+    <span class="grp"><i class="ico" data-i="tiktok"></i><i class="ico" data-i="x"></i><span class="h">utm_my</span></span>
+    <span class="grp"><i class="ico" data-i="instagram"></i><span class="h">utmofficial</span></span>
   </div>
+<script src="icons.js"></script>
+<script>
+  document.querySelectorAll("#band .ico[data-i]").forEach(el=>{
+    el.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${window.ICONS[el.dataset.i]}"/></svg>`;
+  });
+</script>
 </div>
 
 <script>
